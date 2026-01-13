@@ -1,0 +1,41 @@
+/*
+Theme Name: WooComProduct
+Theme URI: https://wordpress.org/themes/woocomproduct/
+Author: Dinesh
+Author URI: https://hushnara.com/
+Description: A custom WordPress theme that is fully WooCommerce compatible using WooCommerce action hooks and filters to ensure seamless integration with WooCommerce functionalities.
+Requires at least: 6.7
+Tested up to: 6.9
+Requires PHP: 7.2
+Version: 1.0.0
+License: GNU General Public License v2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: woocomproduct
+Tags: checkout, shipping, discounts, payments, product catalog, responsive-layout, custom-logo, custom-menu, featured-images, theme-options, translation-ready, woocommerce
+*/
+
+/* -------------------------------
+   Product badge styles
+   Used for shop/category listing badges (Local / Imported)
+   ------------------------------- */
+
+.products .product { position: relative; }
+.woocomproduct-badge {
+    display: inline-block;
+    position: absolute;
+    top: 0.5rem;
+    left: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 3px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #fff;
+    z-index: 10;
+}
+.woocomproduct-badge--local { background: #27ae60; }
+.woocomproduct-badge--imported { background: #e67e22; }
+
+@media (max-width: 480px) {
+  .woocomproduct-badge { font-size: 0.65rem; top: 0.4rem; left: 0.4rem; padding: 0.2rem 0.4rem; }
+}
