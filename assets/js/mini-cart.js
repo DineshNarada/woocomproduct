@@ -10,12 +10,16 @@
             $panel.removeAttr('hidden');
             $panel.attr('aria-hidden','false');
             $panel.show();
+            // move focus into the panel for keyboard users
+            $panel.focus();
         }
         function closePanel(){
             $toggle.attr('aria-expanded','false');
             $panel.attr('hidden','true');
             $panel.attr('aria-hidden','true');
             $panel.hide();
+            // return focus to the toggle button
+            $toggle.focus();
         }
 
         $toggle.on('click', function(e){

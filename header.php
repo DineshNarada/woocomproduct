@@ -30,7 +30,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                 <span class="mini-cart-count" aria-live="polite"><?php echo ( function_exists( 'WC' ) && WC()->cart ) ? WC()->cart->get_cart_contents_count() : 0; ?></span>
             </button>
 
-            <div id="mini-cart-panel" class="mini-cart-panel" hidden>
+            <div id="mini-cart-panel" class="mini-cart-panel" hidden aria-hidden="true" role="region" aria-label="<?php esc_attr_e( 'Mini cart', 'woocomproduct' ); ?>" tabindex="-1">
                 <?php
                 // Include dynamic mini cart content (uses `inc/mini-cart.php`)
                 if ( locate_template( 'inc/mini-cart.php' ) ) {

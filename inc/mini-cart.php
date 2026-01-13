@@ -4,6 +4,8 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
+echo '<div class="mini-cart-content">';
+
 if ( function_exists( 'woocommerce_mini_cart' ) ) {
     echo '<div class="widget_shopping_cart_content">';
     woocommerce_mini_cart();
@@ -26,3 +28,5 @@ if ( function_exists( 'woocommerce_mini_cart' ) ) {
     </div>
     <?php
 }
+
+echo '</div>'; // .mini-cart-content
