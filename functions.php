@@ -7,7 +7,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 // Theme support for WooCommerce
 add_action( 'after_setup_theme', 'woocomproduct_theme_setup' );
 function woocomproduct_theme_setup() {
-    add_theme_support( 'woocommerce' );
+    // Add support for featured images (post thumbnails)
+    add_theme_support( 'post-thumbnails' );
+
+    // Support WooCommerce and set sensible default image widths
+    add_theme_support( 'woocommerce', array(
+        'thumbnail_image_width' => 300,
+        'single_image_width'    => 600,
+    ) );
 
     // Additional WooCommerce support features can be added here
 }
