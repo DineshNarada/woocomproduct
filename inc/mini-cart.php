@@ -5,6 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 echo '<div class="mini-cart-content">';
+echo '<div class="mini-cart-notice" role="status" aria-live="polite" hidden></div>'; 
 
 if ( function_exists( 'woocommerce_mini_cart' ) ) {
     echo '<div class="widget_shopping_cart_content">';
@@ -38,6 +39,7 @@ add_filter( 'woocommerce_add_to_cart_fragments', 'woocomproduct_mini_cart_fragme
 function woocomproduct_mini_cart_fragments( $fragments ) {
     ob_start();
     echo '<div class="mini-cart-content">';
+    echo '<div class="mini-cart-notice" role="status" aria-live="polite" hidden></div>'; 
     if ( function_exists( 'woocommerce_mini_cart' ) ) {
         echo '<div class="widget_shopping_cart_content">';
         woocommerce_mini_cart();
@@ -48,5 +50,65 @@ function woocomproduct_mini_cart_fragments( $fragments ) {
     }
     echo '</div>';
     $fragments['div.mini-cart-content'] = ob_get_clean();
+    // Also provide a small fragment for the header count so it updates reliably
+    $fragments['.mini-cart-count'] = '<span class="mini-cart-count" aria-live="polite">' . esc_html( WC()->cart->get_cart_contents_count() ) . '</span>';
     return $fragments;
+}
+
+/**
+ * AJAX endpoint: remove a cart item and return refreshed fragments
+ */
+add_action( 'wp_ajax_woocomproduct_remove_cart_item', 'woocomproduct_ajax_remove_cart_item' );
+add_action( 'wp_ajax_nopriv_woocomproduct_remove_cart_item', 'woocomproduct_ajax_remove_cart_item' );
+function woocomproduct_ajax_remove_cart_item() {
+    check_ajax_referer( 'woocomproduct-mini-cart', 'nonce' );
+
+    if ( empty( $_POST['cart_item_key'] ) ) {
+        wp_send_json_error( array( 'message' => __( 'Missing cart item', 'woocomproduct' ) ) );
+    }
+
+    $cart_item_key = sanitize_text_field( wp_unslash( $_POST['cart_item_key'] ) );
+    $removed = WC()->cart->remove_cart_item( $cart_item_key );
+
+    if ( ! $removed ) {
+        wp_send_json_error( array( 'message' => __( 'Could not remove item', 'woocomproduct' ) ) );
+    }
+
+    // Ensure totals are recalculated
+    WC()->cart->calculate_totals();
+
+    // Return refreshed fragments (uses the theme's fragment filter)
+    $fragments = apply_filters( 'woocommerce_add_to_cart_fragments', array() );
+
+    wp_send_json_success( array( 'fragments' => $fragments ) );
+}
+
+/**
+ * AJAX endpoint: update cart item quantity and return refreshed fragments
+ */
+add_action( 'wp_ajax_woocomproduct_update_cart_item', 'woocomproduct_ajax_update_cart_item' );
+add_action( 'wp_ajax_nopriv_woocomproduct_update_cart_item', 'woocomproduct_ajax_update_cart_item' );
+function woocomproduct_ajax_update_cart_item() {
+    check_ajax_referer( 'woocomproduct-mini-cart', 'nonce' );
+
+    if ( empty( $_POST['cart_item_key'] ) || ! isset( $_POST['quantity'] ) ) {
+        wp_send_json_error( array( 'message' => __( 'Missing parameters', 'woocomproduct' ) ) );
+    }
+
+    $cart_item_key = sanitize_text_field( wp_unslash( $_POST['cart_item_key'] ) );
+    $quantity = wc_stock_amount( wp_unslash( $_POST['quantity'] ) );
+
+    $updated = WC()->cart->set_quantity( $cart_item_key, $quantity, true );
+
+    if ( ! $updated ) {
+        wp_send_json_error( array( 'message' => __( 'Could not update quantity', 'woocomproduct' ) ) );
+    }
+
+    // Ensure totals are recalculated
+    WC()->cart->calculate_totals();
+
+    // Return refreshed fragments
+    $fragments = apply_filters( 'woocommerce_add_to_cart_fragments', array() );
+
+    wp_send_json_success( array( 'fragments' => $fragments ) );
 }

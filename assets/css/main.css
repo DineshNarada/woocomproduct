@@ -61,6 +61,27 @@
 .button { background: #222; color: #fff; padding: 0.5rem 0.75rem; text-decoration: none; border-radius: 4px; }
 .button.alt { background: transparent; color: #222; border: 1px solid #ddd; }
 
+/* Mini cart notices (success / error) */
+.mini-cart-notice {
+  display: none;
+  font-size: 0.875rem;
+  padding: 0.45rem 0.6rem;
+  margin-bottom: 0.5rem;
+  border-radius: 4px;
+  line-height: 1.2;
+  background: #e6f7ea; /* light success background */
+  color: #0b2f1a;      /* dark green text */
+  border: 1px solid #c1e6c8;
+}
+.mini-cart-notice:not([hidden]) {
+  display: block;
+}
+.mini-cart-notice.is-error {
+  background: #fdecea; /* light error background */
+  color: #4a0b0b;      /* dark red text */
+  border-color: #f1b0ad;
+}
+
 /* Small screens */
 @media (max-width: 640px) {
   .header-inner { flex-wrap: wrap; }

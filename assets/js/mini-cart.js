@@ -61,6 +61,116 @@
             // Allow other scripts to hook into the update
             $(document.body).trigger('woocom_mini_cart_updated');
         });
+
+        // Helper: read query param from URL
+        function getParamByName(name, url) {
+            if (!url) return null;
+            name = name.replace(/[\[\]]/g, "\\$&");
+            var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"), results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, " "));
+        }
+
+        // Utility: show notice in the mini cart (auto-hide)
+        function showNotice(message, isError) {
+            var $notice = $('.mini-cart-notice');
+            if ( ! $notice.length ) return;
+            $notice.text(message || '');
+            if ( isError ) {
+                $notice.addClass('is-error');
+            } else {
+                $notice.removeClass('is-error');
+            }
+            $notice.removeAttr('hidden');
+            clearTimeout($notice.data('hideTimeout'));
+            $notice.data('hideTimeout', setTimeout(function(){
+                $notice.attr('hidden','true');
+            }, 4000));
+        }
+
+        // Helper: disable/enable interactive elements in mini cart while request is active
+        function setPanelBusy($panel, busy) {
+            $panel.attr('aria-busy', busy ? 'true' : 'false');
+            $panel.find('.remove, .qty input, .quantity input, .button').prop('disabled', !!busy);
+        }
+
+        // Handle remove-by-click in mini cart via AJAX with error handling
+        $panel.off('click.miniCartRemove', '.remove').on('click.miniCartRemove', '.remove', function(e){
+            e.preventDefault();
+            var $this = $(this);
+            var cartItemKey = $this.data('cart_item_key') || getParamByName('remove_item', $this.attr('href'));
+            if ( ! cartItemKey ) return;
+
+            setPanelBusy($panel, true);
+            $.post(woocomproduct_ajax.ajax_url, {
+                action: 'woocomproduct_remove_cart_item',
+                cart_item_key: cartItemKey,
+                nonce: woocomproduct_ajax.nonce
+            }).done(function(resp){
+                if ( resp && resp.success ) {
+                    if ( resp.data && resp.data.fragments ) {
+                        $.each(resp.data.fragments, function(selector, html){
+                            try { $(selector).replaceWith(html); } catch (e) { $(selector).html(html); }
+                        });
+                        // Trigger both namespaced and un-namespaced refresh events for compatibility
+                        $(document.body).trigger('wc_fragments_refreshed');
+                        $(document.body).trigger('wc_fragments_refreshed.miniCart');
+                        $(document.body).trigger('woocom_mini_cart_updated');
+                        showNotice( woocomproduct_ajax.remove_success || 'Cart updated' );
+                    } else {
+                        // No fragments returned; force a full reload to ensure consistency
+                        window.location.reload();
+                    }
+                } else {
+                    showNotice( (resp && resp.data && resp.data.message) ? resp.data.message : 'Could not remove item', true );
+                }
+            }).fail(function(){
+                showNotice('Network error. Please try again.', true);
+            }).always(function(){
+                setPanelBusy($panel, false);
+            });
+        });
+
+        // Debounced quantity change handler
+        $panel.off('input.miniCartQty input change.miniCartQtyChange', '.qty input, .quantity input').on('input.miniCartQty input change.miniCartQtyChange', '.qty input, .quantity input', function(e){
+            var $input = $(this);
+            var qty = $input.val();
+            var $item = $input.closest('.mini_cart_item');
+            var cartItemKey = $item.find('.remove').data('cart_item_key');
+            if ( ! cartItemKey ) return;
+
+            clearTimeout($input.data('qtyTimeout'));
+            $input.data('qtyTimeout', setTimeout(function(){
+                setPanelBusy($panel, true);
+                $.post(woocomproduct_ajax.ajax_url, {
+                    action: 'woocomproduct_update_cart_item',
+                    cart_item_key: cartItemKey,
+                    quantity: qty,
+                    nonce: woocomproduct_ajax.nonce
+                }).done(function(resp){
+                    if ( resp && resp.success ) {
+                        if ( resp.data && resp.data.fragments ) {
+                            $.each(resp.data.fragments, function(selector, html){
+                                try { $(selector).replaceWith(html); } catch (e) { $(selector).html(html); }
+                            });
+                            $(document.body).trigger('wc_fragments_refreshed');
+                            $(document.body).trigger('wc_fragments_refreshed.miniCart');
+                            $(document.body).trigger('woocom_mini_cart_updated');
+                            showNotice( woocomproduct_ajax.update_success || 'Cart updated' );
+                        } else {
+                            window.location.reload();
+                        }
+                    } else {
+                        showNotice( (resp && resp.data && resp.data.message) ? resp.data.message : 'Could not update quantity', true );
+                    }
+                }).fail(function(){
+                    showNotice('Network error. Please try again.', true);
+                }).always(function(){
+                    setPanelBusy($panel, false);
+                });
+            }, 600));
+        });
     }
 
     function openPanel($toggle,$panel){
