@@ -51,4 +51,6 @@ if ( class_exists( 'WooCommerce' ) ) {
     require_once get_template_directory() . '/inc/product-badges.php';
     // Checkout fields (Business Type dropdown)
     require_once get_template_directory() . '/inc/checkout-fields.php';
-}
+    // Discounts (automatic discount rules)
+    require_once get_template_directory() . '/inc/discounts.php';
+} 
