@@ -34,6 +34,11 @@ function woocomproduct_theme_setup() {
             'ajax_url' => admin_url( 'admin-ajax.php' ),
             'nonce'    => wp_create_nonce( 'woocomproduct-mini-cart' ),
         ) );
+
+        // Checkout fields JS (only on checkout pages)
+        if ( function_exists( 'is_checkout' ) && is_checkout() ) {
+            wp_enqueue_script( 'woocomproduct-checkout-fields', get_template_directory_uri() . '/assets/js/checkout-fields.js', array(), wp_get_theme()->get( 'Version' ), true );
+        }
     }
 
 // Load product meta handlers (moved to inc/product-meta.php)

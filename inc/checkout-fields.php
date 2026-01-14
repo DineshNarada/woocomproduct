@@ -22,17 +22,44 @@ function woocomproduct_add_business_type_field( $fields ) {
         'priority' => 120,
     );
 
+    $fields['billing']['billing_vat_number'] = array(
+        'type'        => 'text',
+        'label'       => __( 'VAT Number', 'woocomproduct' ),
+        'required'    => false,
+        'class'       => array( 'form-row-wide', 'vat-number-field' ),
+        'placeholder' => __( 'Enter VAT / Tax number (company only)', 'woocomproduct' ),
+        'priority'    => 125,
+    );
+
     return $fields;
 }
 
 /**
- * Display Business Type in admin order billing address panel for quick reference
+ * Save and display Business Type & VAT for orders
  */
+add_action( 'woocommerce_checkout_update_order_meta', 'woocomproduct_save_business_fields' );
+function woocomproduct_save_business_fields( $order_id ) {
+    if ( isset( $_POST['billing_business_type'] ) ) {
+        update_post_meta( $order_id, '_billing_business_type', sanitize_text_field( wp_unslash( $_POST['billing_business_type'] ) ) );
+    }
+
+    if ( isset( $_POST['billing_vat_number'] ) && $_POST['billing_vat_number'] !== '' ) {
+        update_post_meta( $order_id, '_billing_vat_number', sanitize_text_field( wp_unslash( $_POST['billing_vat_number'] ) ) );
+    } else {
+        delete_post_meta( $order_id, '_billing_vat_number' );
+    }
+}
+
 add_action( 'woocommerce_admin_order_data_after_billing_address', 'woocomproduct_display_business_type_in_admin', 10, 1 );
 function woocomproduct_display_business_type_in_admin( $order ) {
     $business_type = get_post_meta( $order->get_id(), '_billing_business_type', true );
     if ( $business_type ) {
         $label = $business_type === 'company' ? __( 'Company', 'woocomproduct' ) : __( 'Individual', 'woocomproduct' );
         echo '<p><strong>' . esc_html__( 'Business Type', 'woocomproduct' ) . ':</strong> ' . esc_html( $label ) . '</p>';
+    }
+
+    $vat = get_post_meta( $order->get_id(), '_billing_vat_number', true );
+    if ( $vat ) {
+        echo '<p><strong>' . esc_html__( 'VAT Number', 'woocomproduct' ) . ':</strong> ' . esc_html( $vat ) . '</p>';
     }
 }
