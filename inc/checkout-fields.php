@@ -87,3 +87,54 @@ function woocomproduct_display_business_type_in_admin( $order ) {
         echo '<p><strong>' . esc_html__( 'VAT Number', 'woocomproduct' ) . ':</strong> ' . esc_html( $vat ) . '</p>';
     }
 }
+
+/**
+ * Include fields on the thank you / order received and view order pages
+ */
+add_action( 'woocommerce_thankyou', 'woocomproduct_display_business_fields_on_thankyou', 20 );
+add_action( 'woocommerce_view_order', 'woocomproduct_display_business_fields_on_thankyou', 20 );
+function woocomproduct_display_business_fields_on_thankyou( $order_id ) {
+    if ( is_object( $order_id ) && method_exists( $order_id, 'get_id' ) ) {
+        $order = $order_id;
+        $order_id = $order->get_id();
+    }
+
+    $business_type = get_post_meta( $order_id, '_billing_business_type', true );
+    $vat = get_post_meta( $order_id, '_billing_vat_number', true );
+
+    echo '<section class="woocomproduct-business-fields">';
+    if ( $business_type ) {
+        $label = $business_type === 'company' ? __( 'Company', 'woocomproduct' ) : __( 'Individual', 'woocomproduct' );
+        echo '<p><strong>' . esc_html__( 'Business Type', 'woocomproduct' ) . ':</strong> ' . esc_html( $label ) . '</p>';
+    }
+
+    if ( $vat ) {
+        echo '<p><strong>' . esc_html__( 'VAT Number', 'woocomproduct' ) . ':</strong> ' . esc_html( $vat ) . '</p>';
+    }
+    echo '</section>';
+}
+
+/**
+ * Add Business Type and VAT Number to order emails
+ */
+add_filter( 'woocommerce_email_order_meta_fields', 'woocomproduct_add_business_fields_to_emails', 10, 3 );
+function woocomproduct_add_business_fields_to_emails( $fields, $sent_to_admin, $order ) {
+    $business = get_post_meta( $order->get_id(), '_billing_business_type', true );
+    $vat = get_post_meta( $order->get_id(), '_billing_vat_number', true );
+
+    if ( $business ) {
+        $fields['billing_business_type'] = array(
+            'label' => __( 'Business Type', 'woocomproduct' ),
+            'value' => $business === 'company' ? __( 'Company', 'woocomproduct' ) : __( 'Individual', 'woocomproduct' ),
+        );
+    }
+
+    if ( $vat ) {
+        $fields['billing_vat_number'] = array(
+            'label' => __( 'VAT Number', 'woocomproduct' ),
+            'value' => $vat,
+        );
+    }
+
+    return $fields;
+}
