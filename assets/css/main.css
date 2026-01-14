@@ -88,3 +88,34 @@
   .site-navigation { order: 3; width: 100%; margin-left: 0; }
   .mini-cart-panel { right: 1rem; left: 1rem; width: auto; }
 }
+
+/* Product badges */
+.woocommerce ul.products li.product {
+  position: relative;
+}
+
+/* Base badge style */
+.woocomproduct-badge {
+  position: absolute;
+  font-size: 14px;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-family: 'Helvetica', 'Arial', sans-serif;
+  border-radius: 3px;
+  z-index: 10;
+  opacity: 0.65;
+  pointer-events: none;
+  white-space: nowrap;
+  max-width: 45%;           /* prevents badge from exceeding image width */
+  box-sizing: border-box;
+}
+
+.woocomproduct-badge--local {
+  background-color: rgba(34, 139, 34, 0.9); /* deep green */
+  color: #fff;
+}
+
+.woocomproduct-badge--imported {
+  background-color: rgba(0, 0, 128, 0.9); /* navy blue */
+  color: #fff;
+}
