@@ -11,7 +11,8 @@ get_header();
     <?php
     if ( have_posts() ) :
         while ( have_posts() ) : the_post();
-            echo '<article id="post-' . get_the_ID() . '" ' . get_post_class() . '>';
+            $classes = implode( ' ', get_post_class( '', get_the_ID() ) );
+            echo '<article id="post-' . get_the_ID() . '" class="' . esc_attr( $classes ) . '">';
 
             // Page title
             echo '<header class="entry-header">';
