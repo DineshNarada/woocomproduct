@@ -50,6 +50,30 @@ function woocomproduct_save_business_fields( $order_id ) {
     }
 }
 
+/**
+ * Countries that require VAT when Business Type is Company.
+ * Default: Sri Lanka (LK). Use the filter `woocomproduct_vat_required_countries` to change.
+ */
+function woocomproduct_get_vat_required_countries() {
+    return apply_filters( 'woocomproduct_vat_required_countries', array( 'LK' ) );
+}
+
+/**
+ * Validate VAT number on checkout when Company + specific countries
+ */
+add_action( 'woocommerce_checkout_process', 'woocomproduct_validate_vat_number' );
+function woocomproduct_validate_vat_number() {
+    if ( isset( $_POST['billing_business_type'] ) && 'company' === sanitize_text_field( wp_unslash( $_POST['billing_business_type'] ) ) ) {
+        $country = isset( $_POST['billing_country'] ) ? sanitize_text_field( wp_unslash( $_POST['billing_country'] ) ) : '';
+        $required = woocomproduct_get_vat_required_countries();
+        if ( in_array( $country, $required, true ) ) {
+            if ( empty( $_POST['billing_vat_number'] ) ) {
+                wc_add_notice( __( 'VAT Number is required for Company billing addresses in your country.', 'woocomproduct' ), 'error' );
+            }
+        }
+    }
+}
+
 add_action( 'woocommerce_admin_order_data_after_billing_address', 'woocomproduct_display_business_type_in_admin', 10, 1 );
 function woocomproduct_display_business_type_in_admin( $order ) {
     $business_type = get_post_meta( $order->get_id(), '_billing_business_type', true );
