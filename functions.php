@@ -53,4 +53,6 @@ if ( class_exists( 'WooCommerce' ) ) {
     require_once get_template_directory() . '/inc/checkout-fields.php';
     // Discounts (automatic discount rules)
     require_once get_template_directory() . '/inc/discounts.php';
-} 
+    // Shipping methods (location-based rates)
+    require_once get_template_directory() . '/inc/shipping.php';
+}  

@@ -12,8 +12,10 @@ if ( ! defined( 'ABSPATH' ) ) {
  *   - `woocomproduct_discount_threshold` (default 20000)
  *   - `woocomproduct_discount_percentage` (default 20)
  *   - `woocomproduct_discount_taxable` (default true)
+ *   - `woocomproduct_discount_tax_class` (default '')
  */
-add_action( 'woocommerce_cart_calculate_fees', 'woocomproduct_apply_automatic_discount', 20, 1 );
+// Run earlier so shipping methods and tax calculators receive the discounted totals
+add_action( 'woocommerce_cart_calculate_fees', 'woocomproduct_apply_automatic_discount', 10, 1 );
 function woocomproduct_apply_automatic_discount( $cart ) {
     if ( is_admin() && ! defined( 'DOING_AJAX' ) ) {
         return;
@@ -35,8 +37,16 @@ function woocomproduct_apply_automatic_discount( $cart ) {
         $label = sprintf( __( 'Automatic discount (%s%%)', 'woocomproduct' ), $percentage );
 
         $taxable = (bool) apply_filters( 'woocomproduct_discount_taxable', true );
+        $tax_class = apply_filters( 'woocomproduct_discount_tax_class', '' );
 
-        // Negative fee to show as a discount line. $taxable=true ensures taxes are calculated against discounted totals.
-        $cart->add_fee( $label, -$discount, $taxable );
+        // Avoid duplicate fee lines if totals are recalculated multiple times during the request.
+        foreach ( $cart->get_fees() as $fee ) {
+            if ( $fee->name === $label ) {
+                return;
+            }
+        }
+
+        // Negative fee to show as a discount line. $taxable=true ensures taxes are recalculated against the discounted total.
+        $cart->add_fee( $label, -$discount, $taxable, $tax_class );
     }
 }
