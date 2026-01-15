@@ -28,6 +28,9 @@ function woocomproduct_theme_setup() {
         // Additional theme assets
         wp_enqueue_style( 'woocomproduct-main', get_template_directory_uri() . '/assets/css/main.css', array( 'woocomproduct-style' ), wp_get_theme()->get( 'Version' ) );
 
+        // Breadcrumb styles
+        wp_enqueue_style( 'woocomproduct-breadcrumb', get_template_directory_uri() . '/assets/css/breadcrumb.css', array( 'woocomproduct-main' ), wp_get_theme()->get( 'Version' ) );
+
         // Mini cart JS (initial; file will be added later)
         wp_enqueue_script( 'woocomproduct-mini-cart', get_template_directory_uri() . '/assets/js/mini-cart.js', array( 'jquery' ), wp_get_theme()->get( 'Version' ), true );
         wp_localize_script( 'woocomproduct-mini-cart', 'woocomproduct_ajax', array(

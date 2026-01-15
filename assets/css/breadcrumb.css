@@ -1,0 +1,19 @@
+/* WooCommerce Breadcrumb Styles */
+.woocommerce-breadcrumb {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 0.875rem;
+  color: #666;
+  margin-bottom: 1rem;
+  padding: 0;
+}
+.woocommerce-breadcrumb a {
+  color: #666;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.woocommerce-breadcrumb a:hover {
+  color: #000;
+}
+.woocommerce-breadcrumb::before {
+  content: none;
+}
