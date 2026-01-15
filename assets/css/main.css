@@ -6,11 +6,12 @@
   top: 0;
   z-index: 50;
 }
+
 .header-inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 2rem;
+  padding: 1rem 0;
   max-width: 1200px;
   margin: 0 auto;
 }
@@ -114,9 +115,19 @@
 
 /* Small screens */
 @media (max-width: 640px) {
-  .header-inner { padding: 0.75rem 1rem; flex-wrap: wrap; }
+  .header-inner { padding: 0.75rem 0; flex-wrap: wrap; }
   .site-navigation { order: 3; width: 100%; margin-left: 0; }
   .mini-cart-panel { right: 1rem; left: 1rem; width: auto; }
+}
+
+/* Tablet and larger */
+@media (min-width: 641px) {
+  .header-inner { padding: 1rem 0; }
+}
+
+/* Desktop */
+@media (min-width: 1025px) {
+  .container { padding: 0 2rem; }
 }
 
 /* Product badges */

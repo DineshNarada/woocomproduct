@@ -53,4 +53,17 @@ if ( class_exists( 'WooCommerce' ) ) {
     require_once get_template_directory() . '/inc/discounts.php';
     // Shipping methods (location-based rates)
     require_once get_template_directory() . '/inc/shipping.php';
-}  
+}
+
+//Remove when you need to add another page as home page
+// Redirect home page to shop page
+add_action( 'template_redirect', 'woocomproduct_redirect_home_to_shop' );
+function woocomproduct_redirect_home_to_shop() {
+    if ( is_front_page() && ! is_page( wc_get_page_id( 'shop' ) ) ) {
+        $shop_page_url = get_permalink( wc_get_page_id( 'shop' ) );
+        if ( $shop_page_url ) {
+            wp_redirect( $shop_page_url );
+            exit;
+        }
+    }
+}
