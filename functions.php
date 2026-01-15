@@ -31,6 +31,9 @@ function woocomproduct_theme_setup() {
         // Breadcrumb styles
         wp_enqueue_style( 'woocomproduct-breadcrumb', get_template_directory_uri() . '/assets/css/breadcrumb.css', array( 'woocomproduct-main' ), wp_get_theme()->get( 'Version' ) );
 
+        // Thank you page styles
+        wp_enqueue_style( 'woocomproduct-thank-you', get_template_directory_uri() . '/assets/css/tnq.css', array( 'woocomproduct-breadcrumb' ), wp_get_theme()->get( 'Version' ) );
+
         // Mini cart JS (initial; file will be added later)
         wp_enqueue_script( 'woocomproduct-mini-cart', get_template_directory_uri() . '/assets/js/mini-cart.js', array( 'jquery' ), wp_get_theme()->get( 'Version' ), true );
         wp_localize_script( 'woocomproduct-mini-cart', 'woocomproduct_ajax', array(
@@ -45,7 +48,7 @@ function woocomproduct_theme_setup() {
 require_once get_template_directory() . '/inc/product-meta.php';
 
 /**
- * Load product badges display handlers
+ * Load checkout fields customizations
  */
 if ( class_exists( 'WooCommerce' ) ) {
     require_once get_template_directory() . '/inc/product-badges.php';
@@ -59,6 +62,20 @@ if ( class_exists( 'WooCommerce' ) ) {
     function woocomproduct_cart_count_fragments( $fragments ) {
         $fragments['.mini-cart-count'] = '<span class="mini-cart-count" aria-live="polite">' . ( function_exists( 'WC' ) && WC()->cart ? WC()->cart->get_cart_contents_count() : 0 ) . '</span>';
         return $fragments;
+    }
+
+    // Add download receipt button to thank you page
+    add_action( 'woocommerce_thankyou', 'woocomproduct_add_download_receipt_button', 10, 1 );
+    function woocomproduct_add_download_receipt_button( $order_id ) {
+        if ( ! $order_id ) return;
+
+        $order = wc_get_order( $order_id );
+        if ( ! $order ) return;
+
+        echo '<div class="receipt-actions" style="text-align: center; margin: 2rem 0;">';
+        echo '<button onclick="window.print()" class="button receipt-print-btn" style="margin-right: 1rem;">🖨️ Print Receipt</button>';
+        echo '<a href="' . esc_url( $order->get_view_order_url() ) . '" class="button receipt-view-btn">📄 View Order Details</a>';
+        echo '</div>';
     }
 }
 
