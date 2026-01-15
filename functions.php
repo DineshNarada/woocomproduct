@@ -53,6 +53,13 @@ if ( class_exists( 'WooCommerce' ) ) {
     require_once get_template_directory() . '/inc/discounts.php';
     // Shipping methods (location-based rates)
     require_once get_template_directory() . '/inc/shipping.php';
+
+    // Add mini-cart count to WooCommerce AJAX fragments
+    add_filter( 'woocommerce_add_to_cart_fragments', 'woocomproduct_cart_count_fragments' );
+    function woocomproduct_cart_count_fragments( $fragments ) {
+        $fragments['.mini-cart-count'] = '<span class="mini-cart-count" aria-live="polite">' . ( function_exists( 'WC' ) && WC()->cart ? WC()->cart->get_cart_contents_count() : 0 ) . '</span>';
+        return $fragments;
+    }
 }
 
 //Remove when you need to add another page as home page
