@@ -25,8 +25,12 @@ function woocomproduct_apply_automatic_discount( $cart ) {
         return;
     }
 
-    $threshold = floatval( apply_filters( 'woocomproduct_discount_threshold', 20000 ) );
-    $percentage = floatval( apply_filters( 'woocomproduct_discount_percentage', 20 ) );
+    // Read values from the Theme Customizer (so admins can change them), then allow filters
+    $threshold = floatval( get_theme_mod( 'woocomproduct_discount_threshold', 20000 ) );
+    $threshold = floatval( apply_filters( 'woocomproduct_discount_threshold', $threshold ) );
+
+    $percentage = floatval( get_theme_mod( 'woocomproduct_discount_percentage', 20 ) );
+    $percentage = floatval( apply_filters( 'woocomproduct_discount_percentage', $percentage ) );
 
     // Subtotal before fees and coupons, excluding taxes.
     $subtotal = floatval( $cart->get_subtotal() );
@@ -34,7 +38,7 @@ function woocomproduct_apply_automatic_discount( $cart ) {
     if ( $subtotal > $threshold ) {
         $discount = round( ( $subtotal * $percentage ) / 100, wc_get_price_decimals() );
 
-        $label = sprintf( __( 'Automatic discount (%s%%)', 'woocomproduct' ), $percentage );
+        $label = sprintf( __( 'Discount (%s%%)', 'woocomproduct' ), $percentage );
 
         $taxable = (bool) apply_filters( 'woocomproduct_discount_taxable', true );
         $tax_class = apply_filters( 'woocomproduct_discount_tax_class', '' );

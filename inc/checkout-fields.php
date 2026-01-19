@@ -4,42 +4,45 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-/* Add custom checkout fields via hooks (no template overrides) */
-add_filter( 'woocommerce_checkout_fields', 'woocomproduct_add_checkout_fields' );
-function woocomproduct_add_checkout_fields( $fields ) {
-    // Business Type (billing_business_type)
-    $fields['billing']['billing_business_type'] = array(
-        'type'     => 'select',
-        'label'    => __( 'Business Type', 'woocomproduct' ),
-        'required' => false,
-        'class'    => array( 'form-row-wide' ),
-        'options'  => array(
-            ''           => __( 'Select…', 'woocomproduct' ),
-            'individual' => __( 'Individual', 'woocomproduct' ),
-            'company' => __( 'Company', 'woocomproduct' ),
+/* Register additional checkout fields for WooCommerce block-based checkout */
+add_action( 'init', 'register_business_vat_block_fields' );
+
+function register_business_vat_block_fields() {
+    if ( ! function_exists( 'woocommerce_register_additional_checkout_field' ) ) return;
+
+    // Registering Business Type field
+    woocommerce_register_additional_checkout_field( array(
+        'id'          => 'woocomproduct/business_type',
+        'label'       => __( 'Business Type', 'woocomproduct' ),
+        'location'    => 'address', // This tells the Block to place it within the address card
+        'type'        => 'select',
+        'required'    => true,
+        'options'     => array(
+            array( 'value' => '',           'label' => __( 'Select…', 'woocomproduct' ) ),
+            array( 'value' => 'individual', 'label' => __( 'Individual', 'woocomproduct' ) ),
+            array( 'value' => 'company',    'label' => __( 'Company', 'woocomproduct' ) ),
         ),
         'priority' => 105,
-    );
+    ) );
 
-    // VAT Number (billing_vat_number) — initially not required; validation handled server-side
-    $fields['billing']['billing_vat_number'] = array(
-        'type'        => 'text',
+    // Registering VAT Number field
+    woocommerce_register_additional_checkout_field( array(
+        'id'          => 'woocomproduct/vat_number',
         'label'       => __( 'VAT Number', 'woocomproduct' ),
-        'required'    => false,
+        'location'    => 'address',
+        'type'        => 'text',
+        'required'    => true,
         'placeholder' => '',
-        'class'       => array( 'form-row-wide', 'vat-number-field' ),
         'priority'    => 106,
-    );
-
-    return $fields;
+    ) );
 }
 
 /* Server-side validation using WooCommerce hooks */
 add_action( 'woocommerce_checkout_process', 'woocomproduct_validate_vat' );
 function woocomproduct_validate_vat() {
-    $business = isset( $_POST['billing_business_type'] ) ? wc_clean( wp_unslash( $_POST['billing_business_type'] ) ) : '';
+    $business = isset( $_POST['woocomproduct/business_type'] ) ? wc_clean( wp_unslash( $_POST['woocomproduct/business_type'] ) ) : '';
     $country  = isset( $_POST['billing_country'] ) ? wc_clean( wp_unslash( $_POST['billing_country'] ) ) : '';
-    $vat      = isset( $_POST['billing_vat_number'] ) ? wc_clean( wp_unslash( $_POST['billing_vat_number'] ) ) : '';
+    $vat      = isset( $_POST['woocomproduct/vat_number'] ) ? wc_clean( wp_unslash( $_POST['woocomproduct/vat_number'] ) ) : '';
 
     // VAT Number is required only when: Business Type = Company AND Country is selected
     if ( 'company' === $business && ! empty( $country ) && empty( $vat ) ) {
@@ -50,11 +53,11 @@ function woocomproduct_validate_vat() {
 /* Ensure values are saved to order meta (safe guard) */
 add_action( 'woocommerce_checkout_update_order_meta', 'woocomproduct_save_checkout_fields' );
 function woocomproduct_save_checkout_fields( $order_id ) {
-    if ( isset( $_POST['billing_business_type'] ) ) {
-        update_post_meta( $order_id, '_billing_business_type', sanitize_text_field( wp_unslash( $_POST['billing_business_type'] ) ) );
+    if ( isset( $_POST['woocomproduct/business_type'] ) ) {
+        update_post_meta( $order_id, '_billing_business_type', sanitize_text_field( wp_unslash( $_POST['woocomproduct/business_type'] ) ) );
     }
-    if ( isset( $_POST['billing_vat_number'] ) ) {
-        update_post_meta( $order_id, '_billing_vat_number', sanitize_text_field( wp_unslash( $_POST['billing_vat_number'] ) ) );
+    if ( isset( $_POST['woocomproduct/vat_number'] ) ) {
+        update_post_meta( $order_id, '_billing_vat_number', sanitize_text_field( wp_unslash( $_POST['woocomproduct/vat_number'] ) ) );
     }
 }
 

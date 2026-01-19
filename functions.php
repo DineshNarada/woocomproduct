@@ -58,6 +58,7 @@ if ( class_exists( 'WooCommerce' ) ) {
     require_once get_template_directory() . '/inc/product-badges.php';
     // Discounts (automatic discount rules)
     require_once get_template_directory() . '/inc/discounts.php';
+    require_once get_template_directory() . '/inc/discounts-settings.php';
     // Shipping methods (location-based rates)
     require_once get_template_directory() . '/inc/shipping.php';
     // Checkout fields customizations
