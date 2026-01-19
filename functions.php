@@ -42,6 +42,9 @@ function woocomproduct_theme_setup() {
             'nonce'    => wp_create_nonce( 'woocomproduct-mini-cart' ),
         ) );
 
+        // Checkout fields JS (for conditional VAT visibility)
+        wp_enqueue_script( 'woocomproduct-checkout', get_template_directory_uri() . '/assets/js/checkout-fields.js', array( 'jquery' ), '1.0.0', true );
+
         // Additional theme assets can be added here
     }
 
@@ -57,6 +60,8 @@ if ( class_exists( 'WooCommerce' ) ) {
     require_once get_template_directory() . '/inc/discounts.php';
     // Shipping methods (location-based rates)
     require_once get_template_directory() . '/inc/shipping.php';
+    // Checkout fields customizations
+    require_once get_template_directory() . '/inc/checkout-fields.php';
 
     // Add mini-cart count to WooCommerce AJAX fragments
     add_filter( 'woocommerce_add_to_cart_fragments', 'woocomproduct_cart_count_fragments' );
