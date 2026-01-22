@@ -2,21 +2,37 @@
 
 /* Hero Section */
 .hero-section {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     padding: 100px 0;
     text-align: center;
     position: relative;
     overflow: hidden;
     width: 100%;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .hero-mobile {
     padding: 60px 0;
+    min-height: 80vh;
 }
 
 .hero-desktop {
     padding: 120px 0;
+    min-height: 100vh;
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/></svg>') repeat;
+    opacity: 0.1;
 }
 
 .hero-section::before {
@@ -279,6 +295,11 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
+    .hero-section {
+        background-attachment: scroll !important;
+        min-height: 70vh;
+    }
+
     .hero-title {
         font-size: 2.5rem;
     }

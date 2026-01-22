@@ -16,19 +16,99 @@ function woocomproduct_theme_setup() {
         'single_image_width'    => 600,
     ) );
 
+    // Add support for custom logo
+    add_theme_support( 'custom-logo' );
+
+    // Add support for custom background
+    add_theme_support( 'custom-background' );
+
+    // Add theme support for selective refresh for widgets
+    add_theme_support( 'customize-selective-refresh-widgets' );
+
     // Additional WooCommerce support features can be added here
+}
+
+// Customizer Setup
+add_action( 'customize_register', 'woocomproduct_customize_register' );
+function woocomproduct_customize_register( $wp_customize ) {
+    // Hero Section Panel
+    $wp_customize->add_panel( 'hero_panel', array(
+        'title'       => __( 'Hero Section', 'woocomproduct' ),
+        'description' => __( 'Customize the hero section on the home page', 'woocomproduct' ),
+        'priority'    => 30,
+    ) );
+
+    // Hero Background Image Section
+    $wp_customize->add_section( 'hero_background_section', array(
+        'title'    => __( 'Background Image', 'woocomproduct' ),
+        'panel'    => 'hero_panel',
+        'priority' => 10,
+    ) );
+
+    // Hero Background Image Setting
+    $wp_customize->add_setting( 'hero_background_image', array(
+        'default'           => '',
+        'sanitize_callback' => 'esc_url_raw',
+        'transport'         => 'refresh',
+    ) );
+
+    // Hero Background Image Control
+    $wp_customize->add_control( new WP_Customize_Image_Control( $wp_customize, 'hero_background_image', array(
+        'label'    => __( 'Hero Background Image', 'woocomproduct' ),
+        'section'  => 'hero_background_section',
+        'settings' => 'hero_background_image',
+        'description' => __( 'Upload an image for the hero section background. If no image is selected, the gradient will be used.', 'woocomproduct' ),
+    ) ) );
+
+    // Hero Overlay Opacity Setting
+    $wp_customize->add_setting( 'hero_overlay_opacity', array(
+        'default'           => 0.7,
+        'sanitize_callback' => 'woocomproduct_sanitize_overlay_opacity',
+        'transport'         => 'refresh',
+    ) );
+
+    // Hero Overlay Opacity Control
+    $wp_customize->add_control( 'hero_overlay_opacity', array(
+        'type'        => 'range',
+        'section'     => 'hero_background_section',
+        'label'       => __( 'Background Overlay Opacity', 'woocomproduct' ),
+        'description' => __( 'Adjust the opacity of the overlay on the background image (0 = transparent, 1 = fully opaque)', 'woocomproduct' ),
+        'input_attrs' => array(
+            'min'  => 0,
+            'max'  => 1,
+            'step' => 0.1,
+        ),
+    ) );
+}
+
+// Sanitize overlay opacity
+function woocomproduct_sanitize_overlay_opacity( $input ) {
+    $input = floatval( $input );
+    return ( $input >= 0 && $input <= 1 ) ? $input : 0.7;
 }
 
 // Dynamic Hero Banner Hook
 add_action( 'woocomproduct_hero_banner', 'woocomproduct_display_hero_banner' );
 function woocomproduct_display_hero_banner() {
+    // Get customizer settings
+    $hero_image = get_theme_mod( 'hero_background_image', '' );
+    $overlay_opacity = get_theme_mod( 'hero_overlay_opacity', 0.7 );
+
     // Detect device type for dynamic content
     $is_mobile = wp_is_mobile();
     $hero_title = $is_mobile ? 'Welcome to Our Store' : 'Welcome to Our Amazing Store';
     $hero_subtitle = $is_mobile ? 'Shop now and discover great deals!' : 'Discover amazing products at unbeatable prices. Shop now and experience the difference.';
     $hero_class = $is_mobile ? 'hero-section hero-mobile' : 'hero-section hero-desktop';
+
+    // Build inline styles
+    $style = '';
+    if ( ! empty( $hero_image ) ) {
+        $style = 'background-image: linear-gradient(rgba(0,0,0,' . esc_attr( $overlay_opacity ) . '), rgba(0,0,0,' . esc_attr( $overlay_opacity ) . ')), url(\'' . esc_url( $hero_image ) . '\'); background-size: cover; background-position: center; background-attachment: fixed;';
+    } else {
+        $style = 'background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);';
+    }
     ?>
-    <section class="<?php echo esc_attr( $hero_class ); ?>">
+    <section class="<?php echo esc_attr( $hero_class ); ?>" style="<?php echo $style; ?>">
         <div class="hero-content">
             <h1 class="hero-title"><?php echo esc_html( $hero_title ); ?></h1>
             <p class="hero-subtitle"><?php echo esc_html( $hero_subtitle ); ?></p>
