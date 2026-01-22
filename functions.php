@@ -81,3 +81,4 @@ if ( class_exists( 'WooCommerce' ) ) {
         echo '</div>';
     }
 }
+
