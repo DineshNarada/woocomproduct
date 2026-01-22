@@ -19,6 +19,25 @@ function woocomproduct_theme_setup() {
     // Additional WooCommerce support features can be added here
 }
 
+// Dynamic Hero Banner Hook
+add_action( 'woocomproduct_hero_banner', 'woocomproduct_display_hero_banner' );
+function woocomproduct_display_hero_banner() {
+    // Detect device type for dynamic content
+    $is_mobile = wp_is_mobile();
+    $hero_title = $is_mobile ? 'Welcome to Our Store' : 'Welcome to Our Amazing Store';
+    $hero_subtitle = $is_mobile ? 'Shop now and discover great deals!' : 'Discover amazing products at unbeatable prices. Shop now and experience the difference.';
+    $hero_class = $is_mobile ? 'hero-section hero-mobile' : 'hero-section hero-desktop';
+    ?>
+    <section class="<?php echo esc_attr( $hero_class ); ?>">
+        <div class="hero-content">
+            <h1 class="hero-title"><?php echo esc_html( $hero_title ); ?></h1>
+            <p class="hero-subtitle"><?php echo esc_html( $hero_subtitle ); ?></p>
+            <a href="<?php echo esc_url( wc_get_page_permalink( 'shop' ) ); ?>" class="hero-cta">Shop Now</a>
+        </div>
+    </section>
+    <?php
+}
+
 // Enqueue theme styles and scripts
     add_action( 'wp_enqueue_scripts', 'woocomproduct_enqueue_assets' );
     function woocomproduct_enqueue_assets() {
@@ -36,6 +55,12 @@ function woocomproduct_theme_setup() {
 
         // Account page styles
         wp_enqueue_style( 'woocomproduct-account', get_template_directory_uri() . '/assets/css/account.css', array( 'woocomproduct-thank-you' ), wp_get_theme()->get( 'Version' ) );
+
+        // Home page styles (only on front page)
+        if ( is_front_page() ) {
+            wp_enqueue_style( 'woocomproduct-home', get_template_directory_uri() . '/assets/css/home.css', array( 'woocomproduct-account' ), wp_get_theme()->get( 'Version' ) );
+        }
+
         wp_enqueue_script( 'woocomproduct-mini-cart', get_template_directory_uri() . '/assets/js/mini-cart.js', array( 'jquery' ), wp_get_theme()->get( 'Version' ), true );
         wp_localize_script( 'woocomproduct-mini-cart', 'woocomproduct_ajax', array(
             'ajax_url' => admin_url( 'admin-ajax.php' ),
