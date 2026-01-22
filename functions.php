@@ -41,11 +41,7 @@ function woocomproduct_theme_setup() {
             'ajax_url' => admin_url( 'admin-ajax.php' ),
             'nonce'    => wp_create_nonce( 'woocomproduct-mini-cart' ),
         ) );
-
-        // Checkout currency update script
-        if ( is_checkout() ) {
-            wp_enqueue_script( 'woocomproduct-checkout-currency', get_template_directory_uri() . '/assets/js/checkout-currency.js', array( 'jquery' ), wp_get_theme()->get( 'Version' ), true );
-        }
+        // Additional theme assets can be added here
     }
 
 // Load product meta handlers (moved to inc/product-meta.php)

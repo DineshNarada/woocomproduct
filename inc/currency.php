@@ -11,22 +11,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Get user's country code
- * Uses billing country if logged in, checkout session, or geolocation
+ * Uses billing country if logged in, otherwise geolocation
  */
 function woocomproduct_get_user_country() {
     static $country = null;
 
     if ( $country !== null ) {
         return $country;
-    }
-
-    // Check checkout session first (for dynamic updates during checkout)
-    if ( function_exists( 'WC' ) && WC()->session ) {
-        $customer = WC()->session->get( 'customer' );
-        if ( ! empty( $customer['country'] ) ) {
-            $country = $customer['country'];
-            return $country;
-        }
     }
 
     // Check if user is logged in and has billing country set
