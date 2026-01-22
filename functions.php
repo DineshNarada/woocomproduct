@@ -41,7 +41,11 @@ function woocomproduct_theme_setup() {
             'ajax_url' => admin_url( 'admin-ajax.php' ),
             'nonce'    => wp_create_nonce( 'woocomproduct-mini-cart' ),
         ) );
-        // Additional theme assets can be added here
+
+        // Checkout currency update script
+        if ( is_checkout() ) {
+            wp_enqueue_script( 'woocomproduct-checkout-currency', get_template_directory_uri() . '/assets/js/checkout-currency.js', array( 'jquery' ), wp_get_theme()->get( 'Version' ), true );
+        }
     }
 
 // Load product meta handlers (moved to inc/product-meta.php)
@@ -57,6 +61,8 @@ if ( class_exists( 'WooCommerce' ) ) {
     require_once get_template_directory() . '/inc/discounts-settings.php';
     // Shipping methods (location-based rates)
     require_once get_template_directory() . '/inc/shipping.php';
+    // Currency display based on location
+    require_once get_template_directory() . '/inc/currency.php';
     // Checkout fields customizations
     //4.require_once get_template_directory() . '/inc/checkout-fields.php';
 
