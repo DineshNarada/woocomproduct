@@ -67,6 +67,9 @@ if ( class_exists( 'WooCommerce' ) ) {
         return $fragments;
     }
 
+    // Checkout fields customizations
+    require_once get_template_directory() . '/inc/checkout-fields.php';
+
     // Add download receipt button to thank you page
     add_action( 'woocommerce_thankyou', 'woocomproduct_add_download_receipt_button', 10, 1 );
     function woocomproduct_add_download_receipt_button( $order_id ) {
