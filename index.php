@@ -94,15 +94,15 @@ get_header();
             ) );
 
             if ( ! empty( $product_categories ) && ! is_wp_error( $product_categories ) ) {
-                foreach ( $product_categories as $category ) {
+                foreach ( $product_categories as $index => $category ) {
                     $thumbnail_id = get_term_meta( $category->term_id, 'thumbnail_id', true );
                     $image_url = wp_get_attachment_url( $thumbnail_id );
                     if ( ! $image_url ) {
                         $image_url = wc_placeholder_img_src();
                     }
                     ?>
-                    <a href="<?php echo get_term_link( $category ); ?>" class="category-card" style="background-image: url('<?php echo esc_url( $image_url ); ?>'); background-size: cover; background-position: center;">
-                        <div style="background: rgba(0,0,0,0.5); padding: 2rem; border-radius: 15px;">
+                    <a href="<?php echo get_term_link( $category ); ?>" class="category-card" style="background-image: url('<?php echo esc_url( $image_url ); ?>'); --category-index: <?php echo $index; ?>;">
+                        <div class="category-content">
                             <h3 class="category-title"><?php echo esc_html( $category->name ); ?></h3>
                             <p class="category-count"><?php echo esc_html( $category->count ); ?> products</p>
                         </div>
@@ -120,10 +120,14 @@ get_header();
     <div class="newsletter-content">
         <h2 class="newsletter-title">Stay Updated</h2>
         <p class="newsletter-subtitle">Subscribe to our newsletter for the latest products and exclusive offers.</p>
-        <form class="newsletter-form" action="#" method="post">
-            <input type="email" name="email" placeholder="Enter your email" class="newsletter-input" required>
-            <button type="submit" class="newsletter-btn">Subscribe</button>
+        <form class="newsletter-form" id="newsletter-form" action="#" method="post">
+            <input type="email" name="email" placeholder="Enter your email address" class="newsletter-input" required aria-label="Email address">
+            <button type="submit" class="newsletter-btn" id="newsletter-submit">
+                <span class="btn-text">Subscribe</span>
+                <span class="btn-loading" style="display: none;">⏳</span>
+            </button>
         </form>
+        <div id="newsletter-message" class="newsletter-message" role="alert" aria-live="polite"></div>
     </div>
 </section>
 

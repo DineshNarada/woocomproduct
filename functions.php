@@ -139,6 +139,7 @@ function woocomproduct_display_hero_banner() {
         // Home page styles (only on front page)
         if ( is_front_page() ) {
             wp_enqueue_style( 'woocomproduct-home', get_template_directory_uri() . '/assets/css/home.css', array( 'woocomproduct-account' ), wp_get_theme()->get( 'Version' ) );
+            wp_enqueue_script( 'woocomproduct-home-js', get_template_directory_uri() . '/assets/js/main.js', array( 'jquery' ), wp_get_theme()->get( 'Version' ), true );
         }
 
         wp_enqueue_script( 'woocomproduct-mini-cart', get_template_directory_uri() . '/assets/js/mini-cart.js', array( 'jquery' ), wp_get_theme()->get( 'Version' ), true );
