@@ -96,16 +96,67 @@ get_header(); ?>
                 ) );
 
                 if ( ! empty( $featured_products ) ) {
-                    woocommerce_product_loop_start();
                     foreach ( $featured_products as $product ) {
-                        $post_object = get_post( $product->get_id() );
-                        setup_postdata( $GLOBALS['post'] =& $post_object );
-                        echo '<div class="product-item featured-product">';
-                        wc_get_template_part( 'content', 'product' );
-                        echo '<span class="product-badge featured-badge">Featured</span>';
-                        echo '</div>';
+                        $product_id = $product->get_id();
+                        $product_link = get_permalink( $product_id );
+                        $product_image = wp_get_attachment_image_src( get_post_thumbnail_id( $product_id ), 'medium' );
+                        $product_image_url = $product_image ? $product_image[0] : wc_placeholder_img_src();
+                        $product_gallery = $product->get_gallery_image_ids();
+                        $alt_image = !empty($product_gallery) ? wp_get_attachment_image_src( $product_gallery[0], 'medium' )[0] : $product_image_url;
+                        $product_name = $product->get_name();
+                        $product_price = $product->get_price_html();
+                        $is_on_sale = $product->is_on_sale();
+                        $is_featured = $product->is_featured();
+                        $attributes = $product->get_attributes();
+                        $size_attr = isset($attributes['pa_size']) ? $attributes['pa_size']->get_options() : [];
+                        $color_attr = isset($attributes['pa_color']) ? $attributes['pa_color']->get_options() : [];
+                        $attr_line = '';
+                        if (!empty($size_attr)) $attr_line .= 'Sizes: ' . implode(', ', array_slice($size_attr, 0, 3));
+                        if (!empty($color_attr)) $attr_line .= (!empty($attr_line) ? ' | ' : '') . 'Colors: ' . implode(', ', array_slice($color_attr, 0, 3));
+                        ?>
+                        <div class="product-card" data-product-id="<?php echo esc_attr( $product_id ); ?>">
+                            <div class="product-image-wrapper">
+                                <a href="<?php echo esc_url( $product_link ); ?>" class="product-link">
+                                    <img src="<?php echo esc_url( $product_image_url ); ?>"
+                                         alt="<?php echo esc_attr( $product_name ); ?>"
+                                         class="product-image primary-image"
+                                         loading="lazy">
+                                    <img src="<?php echo esc_url( $alt_image ); ?>"
+                                         alt="<?php echo esc_attr( $product_name ); ?> - alternate view"
+                                         class="product-image alt-image"
+                                         loading="lazy">
+                                </a>
+                                <?php if ( $is_on_sale ) : ?>
+                                    <span class="product-badge sale-badge">Sale</span>
+                                <?php endif; ?>
+                                <?php if ( $is_featured ) : ?>
+                                    <span class="product-badge featured-badge">Featured</span>
+                                <?php endif; ?>
+                                <button class="quick-view-btn" data-product-id="<?php echo esc_attr( $product_id ); ?>" aria-label="Quick view <?php echo esc_attr( $product_name ); ?>">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
+                                </button>
+                            </div>
+                            <div class="product-info">
+                                <h3 class="product-title">
+                                    <a href="<?php echo esc_url( $product_link ); ?>"><?php echo esc_html( $product_name ); ?></a>
+                                </h3>
+                                <div class="product-price"><?php echo $product_price; ?></div>
+                                <?php if ( !empty($attr_line) ) : ?>
+                                    <div class="product-attributes"><?php echo esc_html( $attr_line ); ?></div>
+                                <?php endif; ?>
+                                <div class="product-actions">
+                                    <?php
+                                    if ( $product->is_purchasable() && $product->is_in_stock() ) {
+                                        echo '<a href="' . esc_url( $product_link ) . '" class="view-btn btn" aria-label="View ' . esc_attr( $product_name ) . '">View</a>';
+                                    } else {
+                                        echo '<span class="out-of-stock">Out of Stock</span>';
+                                    }
+                                    ?>
+                                </div>
+                            </div>
+                        </div>
+                        <?php
                     }
-                    woocommerce_product_loop_end();
                 } else {
                     echo '<p>No featured products found.</p>';
                 }
