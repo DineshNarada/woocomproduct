@@ -39,6 +39,23 @@ if ( ! defined( 'ABSPATH' ) ) {
             <?php get_product_search_form(); ?>
         </div>
 
+        <div class="header-shop">
+            <a href="<?php echo esc_url( wc_get_page_permalink( 'shop' ) ); ?>" class="shop-link" aria-label="<?php esc_attr_e( 'Shop', 'woocomproduct' ); ?>">
+                <span class="shop-text"><?php esc_html_e( 'Shop', 'woocomproduct' ); ?></span>
+            </a>
+        </div>
+
+        <div class="header-account">
+            <a href="<?php echo esc_url( wc_get_page_permalink( 'myaccount' ) ); ?>" class="account-link" aria-label="<?php esc_attr_e( 'My Account', 'woocomproduct' ); ?>">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                <?php if ( is_user_logged_in() ) : ?>
+                    <span class="account-text"><?php esc_html_e( 'My Account', 'woocomproduct' ); ?></span>
+                <?php else : ?>
+                    <span class="account-text"><?php esc_html_e( 'Login', 'woocomproduct' ); ?></span>
+                <?php endif; ?>
+            </a>
+        </div>
+
         <div class="header-tools">
             <button class="mini-cart-toggle" aria-controls="mini-cart-panel" aria-expanded="false" aria-label="<?php esc_attr_e( 'Open cart', 'woocomproduct' ); ?>">
                 <svg class="mini-cart-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 12.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>

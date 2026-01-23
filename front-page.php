@@ -13,7 +13,7 @@ get_header(); ?>
     <!-- Hero Section -->
     <section class="hero-section" style="background-image: url('<?php echo esc_url( get_theme_mod( 'hero_background_image', '' ) ); ?>');">
         <div class="hero-content">
-            <h1 class="hero-title">FrockMEE – Made for Every Me</h1>
+            <h1 class="hero-title">FrockMEE – Dress Yourself Beautifully</h1>
             <p class="hero-subtitle">Discover casual, party, office & summer frocks</p>
             <div class="hero-buttons">
                 <a href="<?php echo esc_url( wc_get_page_permalink( 'shop' ) ); ?>" class="btn btn-primary">Shop Now</a>
@@ -217,7 +217,7 @@ get_header(); ?>
                                 <div class="product-actions">
                                     <?php
                                     if ( $product->is_purchasable() && $product->is_in_stock() ) {
-                                        echo '<button class="add-to-cart-btn" data-product-id="' . esc_attr( $product_id ) . '" aria-label="Add ' . esc_attr( $product_name ) . ' to cart">Add to Cart</button>';
+                                        echo '<a href="' . esc_url( $product_link ) . '" class="view-btn btn" aria-label="View ' . esc_attr( $product_name ) . '">View</a>';
                                     } else {
                                         echo '<span class="out-of-stock">Out of Stock</span>';
                                     }

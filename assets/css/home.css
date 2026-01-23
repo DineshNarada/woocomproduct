@@ -381,6 +381,54 @@ h3 { font-size: var(--font-size-2xl); }
     transform: translateY(0);
 }
 
+/* Make View buttons match Add to Cart buttons */
+.view-btn {
+    display: inline-block;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 12px 24px;
+    text-decoration: none;
+    border-radius: 25px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    width: 100%;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    border: none;
+    cursor: pointer;
+}
+
+.view-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+}
+
+.view-btn:hover::before {
+    left: 100%;
+}
+
+.view-btn:hover {
+    background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102,126,234,0.3);
+}
+
+.view-btn:focus {
+    outline: 2px solid rgba(102,126,234,0.5);
+    outline-offset: 2px;
+}
+
+.view-btn:active {
+    transform: translateY(0);
+}
+
 /* Quick view overlay */
 .product-card::after {
     content: '👁️ Quick View';
@@ -943,8 +991,8 @@ h3 { font-size: var(--font-size-2xl); }
 
 .btn-secondary {
     background: transparent;
-    color: var(--primary-color);
-    border-color: var(--primary-color);
+    color: #000;
+    border-color: #000;
 }
 
 .btn-secondary:hover {
@@ -1356,24 +1404,7 @@ h3 { font-size: var(--font-size-2xl); }
     left: var(--spacing-sm);
 }
 
-.quick-view-btn {
-    position: absolute;
-    top: var(--spacing-sm);
-    right: var(--spacing-sm);
-    background: rgba(255, 255, 255, 0.9);
-    border: none;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    opacity: 0;
-    transform: scale(0.8);
-    transition: var(--transition);
-    z-index: 2;
-}
+
 
 .product-card:hover .quick-view-btn {
     opacity: 1;

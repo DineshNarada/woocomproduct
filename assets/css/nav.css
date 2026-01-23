@@ -193,6 +193,75 @@
   border-radius: 2px;
 }
 
+/* Header Account */
+.header-account {
+  margin-left: 1rem;
+}
+
+.account-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+  font-size: 0.9rem;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.account-link:hover,
+.account-link:focus {
+  color: #007cba;
+  background-color: rgba(0, 124, 186, 0.05);
+}
+
+.account-link:focus {
+  outline: 2px solid #007cba;
+  outline-offset: 2px;
+}
+
+.account-link svg {
+  flex-shrink: 0;
+}
+
+.account-text {
+  display: inline-block;
+}
+
+/* Header Shop */
+.header-shop {
+  margin-left: 0.5rem;
+}
+
+.shop-link {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+  font-size: 0.9rem;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.shop-link:hover,
+.shop-link:focus {
+  color: #007cba;
+  background-color: rgba(0, 124, 186, 0.05);
+}
+
+.shop-link:focus {
+  outline: 2px solid #007cba;
+  outline-offset: 2px;
+}
+
+.shop-text {
+  display: inline-block;
+}
+
 /* Mobile Menu Toggle */
 .mobile-menu-toggle {
   display: none;
@@ -295,6 +364,30 @@
   .header-search input[type="search"] {
     width: 150px;
   }
+
+  .header-account {
+    margin-left: 0.5rem;
+  }
+
+  .account-link {
+    padding: 0.5rem;
+  }
+
+  .account-text {
+    display: none; /* Hide text on mobile, show only icon */
+  }
+
+  .header-shop {
+    margin-left: 0.25rem;
+  }
+
+  .shop-link {
+    padding: 0.5rem;
+  }
+
+  .shop-text {
+    font-size: 0.8rem; /* Slightly smaller text on mobile */
+  }
 }
 
 /* Small Mobile */
@@ -315,6 +408,18 @@
   .primary-menu a {
     font-size: 0.9rem;
   }
+
+  .header-account {
+    margin-left: 0.25rem;
+  }
+
+  .header-shop {
+    margin-left: 0.125rem;
+  }
+
+  .shop-text {
+    font-size: 0.75rem; /* Even smaller on very small screens */
+  }
 }
 
 /* Accessibility Enhancements */
@@ -323,7 +428,9 @@
   .sub-menu,
   .mobile-menu-toggle,
   .header-search input[type="search"],
-  .header-search button[type="submit"] {
+  .header-search button[type="submit"],
+  .account-link,
+  .shop-link {
     transition: none;
   }
 }
@@ -332,7 +439,9 @@
 .primary-menu a:focus,
 .mobile-menu-toggle:focus,
 .header-search input[type="search"]:focus,
-.header-search button[type="submit"]:focus {
+.header-search button[type="submit"]:focus,
+.account-link:focus,
+.shop-link:focus {
   outline: 2px solid #007cba;
   outline-offset: 2px;
 }
