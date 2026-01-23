@@ -94,25 +94,27 @@ function woocomproduct_display_hero_banner() {
     $hero_image = get_theme_mod( 'hero_background_image', '' );
     $overlay_opacity = get_theme_mod( 'hero_overlay_opacity', 0.7 );
 
-    // Detect device type for dynamic content
-    $is_mobile = wp_is_mobile();
-    $hero_title = $is_mobile ? 'Welcome to Our Store' : 'Welcome to Our Amazing Store';
-    $hero_subtitle = $is_mobile ? 'Shop now and discover great deals!' : 'Discover amazing products at unbeatable prices. Shop now and experience the difference.';
-    $hero_class = $is_mobile ? 'hero-section hero-mobile' : 'hero-section hero-desktop';
+    // FrockMEE specific content
+    $hero_title = 'FrockMEE – Made for Every Me';
+    $hero_subtitle = 'Discover casual, party, office & summer frocks';
+    $hero_class = 'hero-section frockmee-hero';
 
-    // Build inline styles
+    // Build inline styles - use feminine gradient if no custom image
     $style = '';
     if ( ! empty( $hero_image ) ) {
         $style = 'background-image: linear-gradient(rgba(0,0,0,' . esc_attr( $overlay_opacity ) . '), rgba(0,0,0,' . esc_attr( $overlay_opacity ) . ')), url(\'' . esc_url( $hero_image ) . '\'); background-size: cover; background-position: center; background-attachment: fixed;';
     } else {
-        $style = 'background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);';
+        $style = 'background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);';
     }
     ?>
     <section class="<?php echo esc_attr( $hero_class ); ?>" style="<?php echo $style; ?>">
         <div class="hero-content">
             <h1 class="hero-title"><?php echo esc_html( $hero_title ); ?></h1>
             <p class="hero-subtitle"><?php echo esc_html( $hero_subtitle ); ?></p>
-            <a href="<?php echo esc_url( wc_get_page_permalink( 'shop' ) ); ?>" class="hero-cta">Shop Now</a>
+            <div class="hero-ctas">
+                <a href="<?php echo esc_url( wc_get_page_permalink( 'shop' ) ); ?>" class="hero-cta primary">Shop Now</a>
+                <a href="<?php echo esc_url( get_permalink( wc_get_page_id( 'shop' ) ) . '?orderby=date' ); ?>" class="hero-cta secondary">New Arrivals</a>
+            </div>
         </div>
     </section>
     <?php

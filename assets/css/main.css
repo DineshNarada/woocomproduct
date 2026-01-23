@@ -283,3 +283,68 @@
   background-color: rgba(0, 0, 128, 0.9); /* navy blue */
   color: #fff;
 }
+
+/* Mobile Menu */
+.mobile-menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.mobile-menu-toggle:hover {
+  background: rgba(0,0,0,0.05);
+}
+
+.mobile-menu-toggle svg {
+  display: block;
+  width: 24px;
+  height: 24px;
+}
+
+.site-navigation ul {
+  transition: all 0.3s ease;
+}
+
+@media (max-width: 768px) {
+  .mobile-menu-toggle {
+    display: block;
+  }
+
+  .site-navigation ul {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    flex-direction: column;
+    padding: 1rem 0;
+    transform: translateY(-100%);
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  .site-navigation ul.is-open {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .site-navigation li {
+    width: 100%;
+  }
+
+  .site-navigation a {
+    display: block;
+    padding: 1rem 2rem;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .site-navigation a:hover {
+    background: #f8f9fa;
+  }
+}

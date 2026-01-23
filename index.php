@@ -4,6 +4,64 @@ get_header();
 
 <?php do_action( 'woocomproduct_hero_banner' ); ?>
 
+<!-- Shop by Category Section -->
+<section class="shop-categories">
+    <div class="container">
+        <h2 class="section-title">Shop by Category</h2>
+        <div class="categories-grid">
+            <?php
+            // Define the categories to display with their images
+            $categories = array(
+                'casual-frocks' => array(
+                    'name' => 'Casual Frocks',
+                    'image' => get_template_directory_uri() . '/assets/categories/casual-frocks.jpg'
+                ),
+                'party-frocks' => array(
+                    'name' => 'Party Frocks',
+                    'image' => get_template_directory_uri() . '/assets/categories/party-frocks.jpg'
+                ),
+                'office-formal-frocks' => array(
+                    'name' => 'Office / Formal Frocks',
+                    'image' => get_template_directory_uri() . '/assets/categories/office-formal-frocks.webp'
+                ),
+                'maxi-dresses' => array(
+                    'name' => 'Maxi Dresses',
+                    'image' => get_template_directory_uri() . '/assets/categories/maxi-dresses.jpg'
+                ),
+                'summer-frocks' => array(
+                    'name' => 'Summer Frocks',
+                    'image' => get_template_directory_uri() . '/assets/categories/summer-frocks.avif'
+                )
+            );
+
+            foreach ( $categories as $slug => $category_data ) {
+                $term = get_term_by( 'slug', $slug, 'product_cat' );
+                if ( $term && ! is_wp_error( $term ) ) {
+                    ?>
+                    <div class="category-card">
+                        <a href="<?php echo esc_url( get_term_link( $term ) ); ?>">
+                            <img src="<?php echo esc_url( $category_data['image'] ); ?>" alt="<?php echo esc_attr( $category_data['name'] ); ?>" />
+                            <h3><?php echo esc_html( $category_data['name'] ); ?></h3>
+                        </a>
+                    </div>
+                    <?php
+                } else {
+                    // Fallback: show category even if term doesn't exist
+                    ?>
+                    <div class="category-card">
+                        <a href="<?php echo esc_url( wc_get_page_permalink( 'shop' ) ); ?>">
+                            <img src="<?php echo esc_url( $category_data['image'] ); ?>" alt="<?php echo esc_attr( $category_data['name'] ); ?>" />
+                            <h3><?php echo esc_html( $category_data['name'] ); ?></h3>
+                        </a>
+                    </div>
+                    <?php
+                }
+            }
+            ?>
+        </div>
+    </div>
+</section>
+
 <!-- Featured Products Section -->
 <section class="featured-products">
     <div class="container">
@@ -76,6 +134,78 @@ get_header();
             }
             ?>
         </div>
+    </div>
+</section>
+
+<!-- New Arrivals Section -->
+<section class="new-arrivals">
+    <div class="container">
+        <h2 class="section-title">New Arrivals</h2>
+        <div class="products-grid">
+            <?php
+            $args = array(
+                'post_type'      => 'product',
+                'posts_per_page' => 6,
+                'orderby'        => 'date',
+                'order'          => 'DESC'
+            );
+            $new_arrivals_query = new WP_Query( $args );
+
+            if ( $new_arrivals_query->have_posts() ) {
+                while ( $new_arrivals_query->have_posts() ) {
+                    $new_arrivals_query->the_post();
+                    global $product;
+                    ?>
+                    <div class="product-card">
+                        <a href="<?php the_permalink(); ?>">
+                            <?php echo woocommerce_get_product_thumbnail( 'medium' ); ?>
+                        </a>
+                        <div class="product-info">
+                            <h3 class="product-title"><?php the_title(); ?></h3>
+                            <div class="product-price"><?php echo $product->get_price_html(); ?></div>
+                            <?php woocommerce_template_loop_add_to_cart(); ?>
+                        </div>
+                    </div>
+                    <?php
+                }
+                wp_reset_postdata();
+            } else {
+                echo '<p>No products found.</p>';
+            }
+            ?>
+        </div>
+    </div>
+</section>
+
+<!-- Why Choose FrockMEE Section -->
+<section class="why-choose-frockmee">
+    <div class="container">
+        <h2 class="section-title">Why Choose FrockMEE</h2>
+        <div class="features-grid">
+            <div class="feature-item">
+                <div class="feature-icon">🌟</div>
+                <h3>Premium Fabrics</h3>
+                <p>High-quality materials that feel luxurious and last longer.</p>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">👗</div>
+                <h3>Perfect Fit for Every Body</h3>
+                <p>Designed to flatter all body types with inclusive sizing.</p>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">🚚</div>
+                <h3>Easy Returns & Fast Delivery</h3>
+                <p>Hassle-free returns and quick shipping to get you your frock fast.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action Section -->
+<section class="cta-section">
+    <div class="container">
+        <h2>Find Your Perfect Frock Today</h2>
+        <a href="<?php echo esc_url( wc_get_page_permalink( 'shop' ) ); ?>" class="cta-button">Shop Now</a>
     </div>
 </section>
 

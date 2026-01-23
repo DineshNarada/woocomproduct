@@ -11,7 +11,281 @@ document.addEventListener('DOMContentLoaded', function() {
     initProductCards();
     initCategoryCards();
     initIntersectionObserver();
+    initMobileMenu();
+    initNewArrivals();
+    initCategories();
 });
+
+/**
+ * Initialize New Arrivals specific features
+ */
+function initNewArrivals() {
+    initFilterToggle();
+    initQuickView();
+    initAddToCartFeedback();
+    initLazyLoading();
+    initPriceRange();
+}
+
+/**
+ * Initialize Categories specific features
+ */
+function initCategories() {
+    initCategoryLazyLoading();
+    initCategoryAnalytics();
+}
+
+/**
+ * Lazy loading for category images
+ */
+function initCategoryLazyLoading() {
+    const categoryImages = document.querySelectorAll('.category-image[loading="lazy"]');
+    const imageObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const img = entry.target;
+                const src = img.getAttribute('data-src');
+                if (src) {
+                    img.src = src;
+                    img.classList.add('loaded');
+                }
+                observer.unobserve(img);
+            }
+        });
+    }, {
+        rootMargin: '50px 0px'
+    });
+
+    categoryImages.forEach(img => {
+        imageObserver.observe(img);
+    });
+}
+
+/**
+ * Analytics tracking for category interactions
+ */
+function initCategoryAnalytics() {
+    const categoryLinks = document.querySelectorAll('.category-link');
+
+    categoryLinks.forEach(link => {
+        // Track impressions
+        if (typeof gtag !== 'undefined') {
+            gtag('event', 'view_item_list', {
+                event_category: 'engagement',
+                event_label: link.getAttribute('data-category-name'),
+                custom_parameters: {
+                    category_id: link.getAttribute('data-category-id'),
+                    category_slug: link.getAttribute('data-category-slug')
+                }
+            });
+        }
+
+        // Track clicks
+        link.addEventListener('click', function(e) {
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'select_content', {
+                    event_category: 'engagement',
+                    event_label: this.getAttribute('data-category-name'),
+                    content_type: 'category',
+                    custom_parameters: {
+                        category_id: this.getAttribute('data-category-id'),
+                        category_slug: this.getAttribute('data-category-slug')
+                    }
+                });
+            }
+        });
+    });
+}
+
+/**
+ * Filter toggle functionality
+ */
+function initFilterToggle() {
+    const toggle = document.querySelector('.filter-toggle');
+    const panel = document.getElementById('new-arrivals-filters');
+
+    if (!toggle || !panel) return;
+
+    toggle.addEventListener('click', function() {
+        const isExpanded = this.getAttribute('aria-expanded') === 'true';
+        this.setAttribute('aria-expanded', !isExpanded);
+        panel.hidden = isExpanded;
+    });
+}
+
+/**
+ * Quick view modal functionality
+ */
+function initQuickView() {
+    const modal = document.createElement('div');
+    modal.className = 'quick-view-modal';
+    modal.innerHTML = `
+        <div class="quick-view-content">
+            <button class="quick-view-close" aria-label="Close quick view">&times;</button>
+            <div class="quick-view-body">
+                <div class="quick-view-image">
+                    <img src="" alt="" id="quick-view-img">
+                </div>
+                <div class="quick-view-details">
+                    <h3 id="quick-view-title"></h3>
+                    <div id="quick-view-price"></div>
+                    <div id="quick-view-description"></div>
+                    <div class="quick-view-actions">
+                        <button id="quick-view-add-to-cart" class="add-to-cart-btn">Add to Cart</button>
+                        <a href="" id="quick-view-view-full" class="btn btn-secondary">View Full Product</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    const closeBtn = modal.querySelector('.quick-view-close');
+    const addToCartBtn = modal.querySelector('#quick-view-add-to-cart');
+
+    // Open modal
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.quick-view-btn')) {
+            e.preventDefault();
+            const btn = e.target.closest('.quick-view-btn');
+            const productId = btn.dataset.productId;
+            openQuickView(productId);
+        }
+    });
+
+    // Close modal
+    closeBtn.addEventListener('click', closeQuickView);
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) closeQuickView();
+    });
+
+    // Add to cart from modal
+    addToCartBtn.addEventListener('click', function() {
+        const productId = this.dataset.productId;
+        addToCart(productId, this);
+    });
+
+    // Keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modal.classList.contains('open')) {
+            closeQuickView();
+        }
+    });
+}
+
+function openQuickView(productId) {
+    // Fetch product data (simplified - in real implementation, use AJAX)
+    const card = document.querySelector(`.product-card[data-product-id="${productId}"]`);
+    if (!card) return;
+
+    const img = card.querySelector('.primary-image');
+    const title = card.querySelector('.product-title a');
+    const price = card.querySelector('.product-price');
+    const description = card.querySelector('.product-attributes') || document.createElement('div');
+
+    document.getElementById('quick-view-img').src = img.src;
+    document.getElementById('quick-view-img').alt = img.alt;
+    document.getElementById('quick-view-title').textContent = title.textContent;
+    document.getElementById('quick-view-price').innerHTML = price.innerHTML;
+    document.getElementById('quick-view-description').textContent = description.textContent || 'Beautiful new arrival perfect for any occasion.';
+    document.getElementById('quick-view-view-full').href = title.href;
+    document.getElementById('quick-view-add-to-cart').dataset.productId = productId;
+
+    document.querySelector('.quick-view-modal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeQuickView() {
+    document.querySelector('.quick-view-modal').classList.remove('open');
+    document.body.style.overflow = '';
+}
+
+/**
+ * Add to cart feedback
+ */
+function initAddToCartFeedback() {
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.add-to-cart-btn')) {
+            e.preventDefault();
+            const btn = e.target.closest('.add-to-cart-btn');
+            const productId = btn.dataset.productId;
+            addToCart(productId, btn);
+        }
+    });
+}
+
+function addToCart(productId, btn) {
+    // Show loading state
+    const originalText = btn.textContent;
+    btn.textContent = 'Adding...';
+    btn.disabled = true;
+
+    // Simulate AJAX call (replace with actual WooCommerce AJAX)
+    setTimeout(() => {
+        btn.textContent = 'Added!';
+        btn.classList.add('added');
+        btn.disabled = false;
+
+        // Reset after animation
+        setTimeout(() => {
+            btn.textContent = originalText;
+            btn.classList.remove('added');
+        }, 2000);
+
+        // Update cart count (simplified)
+        updateCartCount();
+    }, 1000);
+}
+
+function updateCartCount() {
+    const countElement = document.querySelector('.mini-cart-count');
+    if (countElement) {
+        const currentCount = parseInt(countElement.textContent) || 0;
+        countElement.textContent = currentCount + 1;
+        countElement.setAttribute('aria-live', 'polite');
+    }
+}
+
+/**
+ * Lazy loading with IntersectionObserver
+ */
+function initLazyLoading() {
+    const images = document.querySelectorAll('img[loading="lazy"]');
+    const imageObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const img = entry.target;
+                img.classList.remove('lazy');
+                observer.unobserve(img);
+            }
+        });
+    });
+
+    images.forEach(img => {
+        imageObserver.observe(img);
+    });
+}
+
+/**
+ * Price range slider
+ */
+function initPriceRange() {
+    const minRange = document.getElementById('price-min');
+    const maxRange = document.getElementById('price-max');
+    const display = document.getElementById('price-display');
+
+    if (!minRange || !maxRange || !display) return;
+
+    function updateDisplay() {
+        const min = parseInt(minRange.value);
+        const max = parseInt(maxRange.value);
+        display.textContent = `$${min} - $${max}`;
+    }
+
+    minRange.addEventListener('input', updateDisplay);
+    maxRange.addEventListener('input', updateDisplay);
+    updateDisplay();
+}
 
 /**
  * Handle image loading states
@@ -256,6 +530,40 @@ function lazyLoadImages() {
     const lazyImages = document.querySelectorAll('img[data-src]');
     lazyImages.forEach(img => {
         imageObserver.observe(img);
+    });
+}
+
+/**
+ * Mobile menu toggle functionality
+ */
+function initMobileMenu() {
+    const toggle = document.querySelector('.mobile-menu-toggle');
+    const menu = document.querySelector('.site-navigation ul');
+
+    if (!toggle || !menu) return;
+
+    toggle.addEventListener('click', function() {
+        const isOpen = menu.classList.contains('is-open');
+        const expanded = this.getAttribute('aria-expanded') === 'true';
+
+        menu.classList.toggle('is-open');
+        this.setAttribute('aria-expanded', !expanded);
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!toggle.contains(e.target) && !menu.contains(e.target)) {
+            menu.classList.remove('is-open');
+            toggle.setAttribute('aria-expanded', 'false');
+        }
+    });
+
+    // Close menu on escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && menu.classList.contains('is-open')) {
+            menu.classList.remove('is-open');
+            toggle.setAttribute('aria-expanded', 'false');
+        }
     });
 }
 
