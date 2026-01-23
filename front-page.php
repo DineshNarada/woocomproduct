@@ -13,7 +13,10 @@ get_header(); ?>
     <!-- Hero Section -->
     <section class="hero-section" style="background-image: url('<?php echo esc_url( get_theme_mod( 'hero_background_image', '' ) ); ?>');">
         <div class="hero-content">
-            <h1 class="hero-title">FrockMEE – Dress Yourself Beautifully</h1>
+            <div class="hero-logo-container">
+                <img src="<?php echo get_template_directory_uri(); ?>/assets/logo/logo-with-name.png" alt="FrockMEE Logo" class="hero-logo">
+            </div>
+            <h1 class="hero-title">Dress Yourself Beautifully</h1>
             <p class="hero-subtitle">Discover casual, party, office & summer frocks</p>
             <div class="hero-buttons">
                 <a href="<?php echo esc_url( wc_get_page_permalink( 'shop' ) ); ?>" class="btn btn-primary">Shop Now</a>
