@@ -21,6 +21,15 @@
   color: #000;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
+.site-logo-link {
+  text-decoration: none;
+  margin-right: 0.25rem;
+}
+.site-logo {
+  height: 40px;
+  width: auto;
+  display: block;
+}
 .site-navigation { flex: 1; margin-left: 2rem; }
 .site-navigation ul {
   list-style: none;

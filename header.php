@@ -17,6 +17,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <header class="site-header">
     <div class="container header-inner">
+        <a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="site-logo-link">
+            <img src="<?php echo get_template_directory_uri(); ?>/assets/logo/logo-without-name.png" alt="<?php bloginfo( 'name' ); ?> Logo" class="site-logo">
+        </a>
         <div class="site-branding">
             <?php if ( function_exists( 'the_custom_logo' ) ) the_custom_logo(); ?>
             <a class="site-title" href="<?php echo esc_url( home_url( '/' ) ); ?>"><?php bloginfo( 'name' ); ?></a>
