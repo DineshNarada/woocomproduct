@@ -7,7 +7,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 get_header();
 ?>
 
-<main id="site-content" class="site-main container">
+<main id="main" class="site-main container">
     <?php
     if ( have_posts() ) :
         while ( have_posts() ) : the_post();

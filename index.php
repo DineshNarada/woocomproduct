@@ -2,6 +2,7 @@
 get_header();
 ?>
 
+<main id="main" class="site-main">
 <?php do_action( 'woocomproduct_hero_banner' ); ?>
 
 <!-- Shop by Category Section -->
@@ -260,6 +261,8 @@ get_header();
         <div id="newsletter-message" class="newsletter-message" role="alert" aria-live="polite"></div>
     </div>
 </section>
+
+</main>
 
 <?php
 get_footer();

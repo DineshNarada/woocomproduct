@@ -13,6 +13,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 <body <?php body_class(); ?>>
 <?php wp_body_open(); ?>
 
+<a class="skip-link screen-reader-text" href="#main"><?php esc_html_e( 'Skip to content', 'woocomproduct' ); ?></a>
+
 <header class="site-header">
     <div class="container header-inner">
         <div class="site-branding">
@@ -24,8 +26,18 @@ if ( ! defined( 'ABSPATH' ) ) {
             <button class="mobile-menu-toggle" aria-controls="primary-menu" aria-expanded="false" aria-label="<?php esc_attr_e( 'Toggle navigation menu', 'woocomproduct' ); ?>">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
             </button>
-            <?php wp_nav_menu( array( 'theme_location' => 'primary', 'container' => false, 'menu_id' => 'primary-menu' ) ); ?>
+            <?php wp_nav_menu( array(
+                'theme_location' => 'primary',
+                'container' => false,
+                'menu_id' => 'primary-menu',
+                'menu_class' => 'primary-menu',
+                'walker' => new Woocomproduct_Walker_Nav_Menu()
+            ) ); ?>
         </nav>
+
+        <div class="header-search">
+            <?php get_product_search_form(); ?>
+        </div>
 
         <div class="header-tools">
             <button class="mini-cart-toggle" aria-controls="mini-cart-panel" aria-expanded="false" aria-label="<?php esc_attr_e( 'Open cart', 'woocomproduct' ); ?>">
