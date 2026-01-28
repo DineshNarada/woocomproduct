@@ -269,3 +269,10 @@ if ( class_exists( 'WooCommerce' ) ) {
     }
 }
 
+// Enable CORS for WooCommerce REST API
+add_action('init', function() {
+    header('Access-Control-Allow-Origin: *'); // Allows requests from any domain. This is fine for testing, but for security in production, replace * with your specific domain (e.g., 'https://yourdomain.com').
+    header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE'); // Allows specified HTTP methods
+    header('Access-Control-Allow-Headers: Authorization, Content-Type'); // Allows the Authorization header (for API keys) and Content-Type.
+});
+
