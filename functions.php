@@ -217,11 +217,20 @@ function woocomproduct_display_hero_banner() {
 
         // Navigation script
         wp_enqueue_script( 'woocomproduct-nav', get_template_directory_uri() . '/assets/js/nav.js', array( 'jquery' ), wp_get_theme()->get( 'Version' ), true );
-        // Additional theme assets can be added here
     }
 
 // Load product meta handlers (moved to inc/product-meta.php)
 require_once get_template_directory() . '/inc/product-meta.php';
+
+/**
+ * Remove add to cart button from shop page
+ *
+ * This functionality was previously in child theme - now integrated into main theme
+ */
+add_action( 'init', 'woocom_remove_add_to_cart_from_shop' );
+function woocom_remove_add_to_cart_from_shop() {
+    remove_action( 'woocommerce_after_shop_loop_item', 'woocommerce_template_loop_add_to_cart', 10 );
+}
 
 /**
  * Load checkout fields customizations
@@ -235,8 +244,8 @@ if ( class_exists( 'WooCommerce' ) ) {
     require_once get_template_directory() . '/inc/shipping.php';
     // Currency display based on location
     require_once get_template_directory() . '/inc/currency.php';
-    // Checkout fields customizations
-    //4.require_once get_template_directory() . '/inc/checkout-fields.php';
+    // Checkout fields customizations (Business Type, VAT Number fields)
+    require_once get_template_directory() . '/inc/checkout-fields.php';
 
     // Add mini-cart count to WooCommerce AJAX fragments
     add_filter( 'woocommerce_add_to_cart_fragments', 'woocomproduct_cart_count_fragments' );
