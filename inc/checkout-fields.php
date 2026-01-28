@@ -169,8 +169,9 @@ function get_woocomproduct_checkout_value( $posted_data, $field_name ) {
  * Validate checkout fields on form submission
  *
  * Handles both classic and block checkout
+ * Runs early to prevent order processing
  */
-add_action( 'woocommerce_checkout_process', 'woocomproduct_validate_vat' );
+add_action( 'woocommerce_checkout_process', 'woocomproduct_validate_vat', 5 );
 function woocomproduct_validate_vat() {
     $posted_data = WC()->checkout->get_posted_data();
     $business    = get_woocomproduct_checkout_value( $posted_data, WOOCOMPRODUCT_BUSINESS_TYPE_FIELD );
@@ -180,6 +181,23 @@ function woocomproduct_validate_vat() {
         wc_add_notice(
             __( 'Please enter a VAT Number for company billing addresses.', WOOCOMPRODUCT_TEXT_DOMAIN ),
             'error'
+        );
+    }
+}
+
+/**
+ * Also validate via after checkout validation hook
+ * Ensures validation works for all checkout types and AJAX
+ */
+add_action( 'woocommerce_after_checkout_validation', 'woocomproduct_validate_vat_ajax', 10, 2 );
+function woocomproduct_validate_vat_ajax( $posted_data, $errors ) {
+    $business = get_woocomproduct_checkout_value( $posted_data, WOOCOMPRODUCT_BUSINESS_TYPE_FIELD );
+    $vat      = get_woocomproduct_checkout_value( $posted_data, WOOCOMPRODUCT_VAT_NUMBER_FIELD );
+
+    if ( 'company' === $business && empty( $vat ) ) {
+        $errors->add(
+            'vat_required',
+            __( 'Please enter a VAT Number for company billing addresses.', WOOCOMPRODUCT_TEXT_DOMAIN )
         );
     }
 }
@@ -236,18 +254,37 @@ function woocomproduct_enqueue_field_visibility_script() {
     $visibility_script = "
         (function(\$){
             function getBusinessType() {
-                return \$('select[name=\"woocomproduct/" . WOOCOMPRODUCT_BUSINESS_TYPE_FIELD . "\"]').val() || \$('select[name=\"billing_" . WOOCOMPRODUCT_BUSINESS_TYPE_FIELD . "\"]').val();
+                // Try block checkout first
+                var blockValue = \$('select[name=\"woocomproduct/" . WOOCOMPRODUCT_BUSINESS_TYPE_FIELD . "\"]').val();
+                if (blockValue) return blockValue;
+                
+                // Fall back to classic checkout
+                return \$('select[name=\"billing_" . WOOCOMPRODUCT_BUSINESS_TYPE_FIELD . "\"]').val();
             }
 
             function getVatInput() {
-                return \$('input[name=\"woocomproduct/" . WOOCOMPRODUCT_VAT_NUMBER_FIELD . "\"]').length
-                    ? \$('input[name=\"woocomproduct/" . WOOCOMPRODUCT_VAT_NUMBER_FIELD . "\"]')
-                    : \$('input[name=\"billing_" . WOOCOMPRODUCT_VAT_NUMBER_FIELD . "\"]');
+                // Try block checkout first
+                var blockInput = \$('input[name=\"woocomproduct/" . WOOCOMPRODUCT_VAT_NUMBER_FIELD . "\"]');
+                if (blockInput.length) return blockInput;
+                
+                // Fall back to classic checkout
+                return \$('input[name=\"billing_" . WOOCOMPRODUCT_VAT_NUMBER_FIELD . "\"]');
             }
 
             function getVatFieldWrapper() {
-                var blockWrapper = \$('input[name=\"woocomproduct/" . WOOCOMPRODUCT_VAT_NUMBER_FIELD . "\"]').closest('div');
-                return blockWrapper.length ? blockWrapper : \$('input[name=\"billing_" . WOOCOMPRODUCT_VAT_NUMBER_FIELD . "\"]').closest('p');
+                // Try block checkout wrapper
+                var blockInput = \$('input[name=\"woocomproduct/" . WOOCOMPRODUCT_VAT_NUMBER_FIELD . "\"]');
+                if (blockInput.length) {
+                    return blockInput.closest('[class*=\"form\"]').length 
+                        ? blockInput.closest('[class*=\"form\"]')
+                        : blockInput.closest('div').length 
+                            ? blockInput.closest('div')
+                            : blockInput.parent();
+                }
+                
+                // Fall back to classic checkout
+                var classicInput = \$('input[name=\"billing_" . WOOCOMPRODUCT_VAT_NUMBER_FIELD . "\"]');
+                return classicInput.closest('p').length ? classicInput.closest('p') : classicInput.parent();
             }
 
             function toggleVat() {
@@ -257,18 +294,28 @@ function woocomproduct_enqueue_field_visibility_script() {
 
                 if (business === 'company') {
                     vatField.show();
-                    vatInput.prop('required', true);
+                    vatInput.attr('required', 'required').prop('required', true);
+                    vatInput.closest('label').find('.required, [aria-required]').show();
                 } else {
                     vatField.hide();
-                    vatInput.prop('required', false);
-                    vatInput.val('');
+                    vatInput.removeAttr('required').prop('required', false);
+                    vatInput.val('').trigger('change');
                 }
             }
 
             \$(function(){
-                toggleVat();
-                \$(document.body).on('change', 'select[name=\"woocomproduct/" . WOOCOMPRODUCT_BUSINESS_TYPE_FIELD . "\"], select[name=\"billing_" . WOOCOMPRODUCT_BUSINESS_TYPE_FIELD . "\"]', toggleVat);
-                \$(document.body).on('updated_checkout', toggleVat);
+                // Initial toggle
+                setTimeout(toggleVat, 100);
+                
+                // Listen for business type changes
+                \$(document).on('change', 'select[name=\"woocomproduct/" . WOOCOMPRODUCT_BUSINESS_TYPE_FIELD . "\"], select[name=\"billing_" . WOOCOMPRODUCT_BUSINESS_TYPE_FIELD . "\"]', function() {
+                    toggleVat();
+                });
+                
+                // Listen for checkout updates
+                \$(document.body).on('updated_checkout', function(){
+                    setTimeout(toggleVat, 100);
+                });
             });
         })(jQuery);
     ";
